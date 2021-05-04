@@ -2,10 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Article;
+use App\Repository\ArticleRepository;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\ArticleRepository;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/api")
@@ -39,10 +46,35 @@ class ApiController extends AbstractController
     public function getArticlebyId(int $id, ArticleRepository $articleRepository):Response {
         $article = $articleRepository->findOneBy(['id' => $id]);
 
+        $articledetails[] = [
+            'title' => $article->getTitle(),
+            'description' => $article->getDescription()
+        ];
+
         dump($article);
+        return $this->json([
+            $articledetails
+        ]);
+
+    }
+
+    /**
+     * @Route ("/addnew"), name="add_new_article", methods={"POST"}
+     */
+
+    public function addNewArticle(Request $request, SerializerInterface $serializer, EntityManagerInterface $em)
+    {
+        $jsonRecu = $request->getContent();
+
+        $newpost = $serializer->deserialize($jsonRecu, Article::class, 'json');
+
+        $em->persist($newpost);
+        $em->flush();
+
+        dump($newpost); 
 
         return $this->json([
-            'article' => $article
+            $newpost
         ]);
     }
 }
