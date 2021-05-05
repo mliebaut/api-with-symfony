@@ -47,4 +47,9 @@ class ArticleRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function removeArticle(Article $article) {
+        $this->manager->remove($article);
+        $this->manager->flush();
+    }
 }

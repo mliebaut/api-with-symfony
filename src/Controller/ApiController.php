@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
+use App\Entity\EtatDesLieux;
+use App\Repository\EtatDesLieuxRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +28,7 @@ class ApiController extends AbstractController
     {
 
         $allArticles = $articleRepository->findAll();
-        dump($allArticles);
+        // dump($allArticles);
 
         foreach ($allArticles as $article) {
             $articles[] = [
@@ -64,17 +66,55 @@ class ApiController extends AbstractController
 
     public function addNewArticle(Request $request, SerializerInterface $serializer, EntityManagerInterface $em)
     {
-        $jsonRecu = $request->getContent();
+        $jsonRecu = json_decode($request->getContent());
 
-        $newpost = $serializer->deserialize($jsonRecu, Article::class, 'json');
+        // dd($jsonRecu);
+        if ($jsonRecu->apikey == 'keytest') {
+        
+            $newpost = $serializer->deserialize($request->getContent(), Article::class, 'json');
 
-        $em->persist($newpost);
-        $em->flush();
+            $em->persist($newpost);
+            $em->flush();
 
-        dump($newpost); 
+            return new Response('ok');
+        }
+        else {
+            return new Response('erreur');
+        }
+    }
 
+    // /**
+    //  * @Route("/articles/{id}", name="delete_article_by_id", methods={"DELETE"}, requirements={"id"}={"\d+"})
+    //  */
+    // public function deleteArticleById($id): JsonResponse
+    // {
+    //     $article = $articleRepository->findOneBy(['id' => $id]);
+
+    //     $this->$articleRepository->removeArticle($article);
+
+    //     return new JsonResponse(['status' => 'Article deleted'], Response::HTTP_NO_CONTENT);
+    // }
+
+    /**
+     * @Route("/etatsdeslieux", name="etats_des_lieux", methods={"GET"})
+     */
+    public function getAllEtatsDesLieux(EtatDesLieuxRepository $etatdeslieuxRepository): Response
+    {
+
+        $alletatsdeslieux = $etatdeslieuxRepository->findAll();
+        dump($alletatsdeslieux);
+
+        foreach ($alletatsdeslieux as $etatdeslieux) {
+            $alletatsdeslieux[] = [
+                'titre'=> $etatdeslieux->getTitre(),
+                'nombre de pieces'=> $etatdeslieux->getNbPieces(),
+                'surface' => $etatdeslieux->getSurface(),
+                'photo' =>$etatdeslieux->getPhoto(),
+                'types' => $etatdeslieux->getTypes()
+            ];
+        }
         return $this->json([
-            $newpost
+            $alletatsdeslieux
         ]);
     }
 }
