@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\EtatDesLieuxRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=EtatDesLieuxRepository::class)
@@ -14,39 +15,46 @@ class EtatDesLieux
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $titre;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $nbPieces;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $surface;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $photo;
 
     /**
      * @ORM\ManyToOne(targetEntity=Types::class, inversedBy="etatDesLieux")
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
     private $Types;
 
 
     /**
      * @ORM\ManyToOne(targetEntity=Villes::class, inversedBy="etatDesLieux")
+     * @Groups({"show_etatdeslieux", "list_etatdeslieux"})
      */
-    private $villes;
+    private $Villes;
 
     public function getId(): ?int
     {
@@ -109,6 +117,18 @@ class EtatDesLieux
     public function setTypes(?Types $Types): self
     {
         $this->Types = $Types;
+
+        return $this;
+    }
+
+    public function getVilles(): ?Villes
+    {
+        return $this->Villes;
+    }
+
+    public function setVilles(?Villes $Villes): self
+    {
+        $this->Villes = $Villes;
 
         return $this;
     }
